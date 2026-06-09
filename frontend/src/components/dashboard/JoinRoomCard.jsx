@@ -1,7 +1,11 @@
+import { useNavigate } from "react-router-dom";
+
 import Card from "../common/Card";
 import Button from "../common/Button";
 
 function JoinRoomCard() {
+  const navigate = useNavigate();
+
   return (
     <Card>
       <h2 className="text-2xl font-bold mb-4">
@@ -12,7 +16,11 @@ function JoinRoomCard() {
         Join an existing room using a room code.
       </p>
 
-      <Button>
+      <Button
+        onClick={() =>
+          navigate("/join-room")
+        }
+      >
         Join Room
       </Button>
     </Card>

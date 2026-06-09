@@ -116,7 +116,7 @@ function RoomPage() {
                     "Room code copied!"
                   );
                 }}
-                className="bg-blue-600 px-3 py-1 rounded text-sm"
+                className="bg-blue-600 hover:bg-blue-700 transition px-3 py-1 rounded text-sm"
               >
                 Copy Code
               </button>
@@ -131,20 +131,20 @@ function RoomPage() {
                     "Invite link copied!"
                   );
                 }}
-                className="bg-green-600 px-3 py-1 rounded text-sm"
+                className="bg-green-600 hover:bg-green-700 transition px-3 py-1 rounded text-sm"
               >
                 Copy Link
               </button>
             </div>
 
             <p className="text-zinc-400 mt-2">
-              Participants Online:{" "}
-              {participants}
+              👥 Participants Online: {participants}
+              
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-4 gap-6">
-            <div className="lg:col-span-3">
+          <div className="grid lg:grid-cols-5 gap-6">
+            <div className="lg:col-span-4">
               <CodeEditor />
             </div>
 

@@ -1,4 +1,20 @@
+import { useNavigate, useParams } from "react-router-dom";
+
 function RoomHeader() {
+  const navigate = useNavigate();
+  const { roomId } = useParams();
+
+  const handleLeaveRoom = () => {
+    navigate("/dashboard");
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    navigate("/login");
+  };
+
   return (
     <div className="border-b border-zinc-800 p-4 flex justify-between items-center">
       <div>
@@ -7,13 +23,25 @@ function RoomHeader() {
         </h1>
 
         <p className="text-zinc-400 text-sm">
-          Room ID: ABC123
+          Room ID: {roomId}
         </p>
       </div>
 
-      <button className="bg-red-600 px-4 py-2 rounded-lg">
-        Leave Room
-      </button>
+      <div className="flex gap-3">
+        <button
+          onClick={handleLeaveRoom}
+          className="bg-zinc-700 hover:bg-zinc-600 transition px-4 py-2 rounded-lg"
+        >
+          Leave Room
+        </button>
+
+        <button
+          onClick={handleLogout}
+          className="bg-red-600 hover:bg-red-700 transition px-4 py-2 rounded-lg"
+        >
+          Logout
+        </button>
+      </div>
     </div>
   );
 }

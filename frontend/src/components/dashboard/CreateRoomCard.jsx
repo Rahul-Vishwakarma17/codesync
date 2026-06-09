@@ -1,7 +1,11 @@
+import { useNavigate } from "react-router-dom";
+
 import Card from "../common/Card";
 import Button from "../common/Button";
 
 function CreateRoomCard() {
+  const navigate = useNavigate();
+
   return (
     <Card>
       <h2 className="text-2xl font-bold mb-4">
@@ -12,7 +16,11 @@ function CreateRoomCard() {
         Start a collaborative coding session.
       </p>
 
-      <Button>
+      <Button
+        onClick={() =>
+          navigate("/create-room")
+        }
+      >
         Create Room
       </Button>
     </Card>
