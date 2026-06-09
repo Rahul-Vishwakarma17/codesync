@@ -65,3 +65,18 @@ export const saveRoomCode = async (
 
   return response.data;
 };
+
+export const getRecentRooms = async () => {
+  const token = localStorage.getItem("token");
+
+  const response = await api.get(
+    "/rooms/recent",
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
+};

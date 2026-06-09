@@ -117,6 +117,26 @@ const saveCode = async (req, res) => {
   }
 };
 
+const getRecentRooms = async (req, res) => {
+  try {
+    const rooms = await Room.find({
+      participants: req.user._id,
+    })
+      .sort({ updatedAt: -1 })
+      .limit(10);
+
+    res.status(200).json({
+      success: true,
+      data: rooms,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 
 
 module.exports = {
@@ -124,4 +144,5 @@ module.exports = {
   joinRoom,
   getRoom,
   saveCode,
+  getRecentRooms,
 };
