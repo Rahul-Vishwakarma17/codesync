@@ -92,28 +92,28 @@ function ChatPlaceholder() {
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="mt-4 flex gap-2">
-        <input
-          value={message}
-          onChange={(e) =>
-            setMessage(e.target.value)
-          }
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              sendMessage();
-            }
-          }}
-          placeholder="Type a message..."
-          className="flex-1 bg-zinc-800 border border-zinc-700 rounded px-3 py-2"
-        />
+     <div className="mt-4 flex items-center gap-2 w-full">
+  <input
+    value={message}
+    onChange={(e) =>
+      setMessage(e.target.value)
+    }
+    onKeyDown={(e) => {
+      if (e.key === "Enter") {
+        sendMessage();
+      }
+    }}
+    placeholder="Type a message..."
+    className="flex-1 min-w-0 bg-zinc-800 border border-zinc-700 rounded px-3 py-2"
+  />
 
-        <button
-          onClick={sendMessage}
-          className="bg-blue-600 px-4 py-2 rounded"
-        >
-          Send
-        </button>
-      </div>
+  <button
+    onClick={sendMessage}
+    className="shrink-0 bg-blue-600 hover:bg-blue-700 transition px-4 py-2 rounded"
+  >
+    Send
+  </button>
+</div>
     </Card>
   );
 }

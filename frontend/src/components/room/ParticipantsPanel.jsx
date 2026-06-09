@@ -1,6 +1,8 @@
 import Card from "../common/Card";
 
-function ParticipantsPanel() {
+function ParticipantsPanel({
+  participants = [],
+}) {
   return (
     <Card>
       <h2 className="font-bold mb-4">
@@ -8,8 +10,11 @@ function ParticipantsPanel() {
       </h2>
 
       <ul className="space-y-2">
-        <li>🟢 Bhavesh</li>
-        <li>🟢 Rahul</li>
+        {participants.map((user) => (
+          <li key={user.socketId}>
+            🟢 {user.name}
+          </li>
+        ))}
       </ul>
     </Card>
   );

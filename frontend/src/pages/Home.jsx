@@ -1,8 +1,30 @@
+import { useNavigate } from "react-router-dom";
+
 import Button from "../components/common/Button";
 import Card from "../components/common/Card";
 import Container from "../components/common/Container";
 
 function Home() {
+  const navigate = useNavigate();
+
+  const token = localStorage.getItem("token");
+
+  const handleCreateRoom = () => {
+    if (token) {
+      navigate("/create-room");
+    } else {
+      navigate("/login");
+    }
+  };
+
+  const handleJoinRoom = () => {
+    if (token) {
+      navigate("/join-room");
+    } else {
+      navigate("/login");
+    }
+  };
+
   return (
     <div>
       {/* Hero Section */}
@@ -28,11 +50,14 @@ function Home() {
             </p>
 
             <div className="flex flex-col sm:flex-row justify-center gap-4 mt-10">
-              <Button>
+              <Button onClick={handleCreateRoom}>
                 Create Room
               </Button>
 
-              <Button className="bg-zinc-800 hover:bg-zinc-700">
+              <Button
+                onClick={handleJoinRoom}
+                className="bg-zinc-800 hover:bg-zinc-700"
+              >
                 Join Room
               </Button>
             </div>
@@ -44,7 +69,6 @@ function Home() {
       <section className="pb-24">
         <Container>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-
             <Card>
               <div className="text-4xl mb-4">⚡</div>
 
@@ -92,7 +116,6 @@ function Home() {
                 Run code directly inside coding rooms with instant output.
               </p>
             </Card>
-
           </div>
         </Container>
       </section>
@@ -111,7 +134,7 @@ function Home() {
             </p>
 
             <div className="mt-8">
-              <Button>
+              <Button onClick={handleCreateRoom}>
                 Create Your First Room
               </Button>
             </div>

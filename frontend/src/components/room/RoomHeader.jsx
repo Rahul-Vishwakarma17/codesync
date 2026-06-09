@@ -35,12 +35,12 @@ function RoomHeader() {
           Leave Room
         </button>
 
-        <button
+        {/* <button
           onClick={handleLogout}
           className="bg-red-600 hover:bg-red-700 transition px-4 py-2 rounded-lg"
         >
           Logout
-        </button>
+        </button> */}
       </div>
     </div>
   );

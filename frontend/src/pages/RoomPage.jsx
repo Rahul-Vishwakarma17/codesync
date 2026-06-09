@@ -6,9 +6,8 @@ import Container from "../components/common/Container";
 import RoomHeader from "../components/room/RoomHeader";
 import ParticipantsPanel from "../components/room/ParticipantsPanel";
 import ChatPlaceholder from "../components/room/ChatPlaceholder";
-import WhiteboardPlaceholder from "../components/room/WhiteboardPlaceholder";
-import Whiteboard from "../components/whiteboard/Whiteboard";
 
+import Whiteboard from "../components/whiteboard/Whiteboard";
 import CodeEditor from "../components/editor/CodeEditor";
 
 import socket from "../services/socket";
@@ -20,9 +19,13 @@ function RoomPage() {
   const [participants, setParticipants] =
     useState(0);
 
+  const [users, setUsers] =
+    useState([]);
+
   const [roomExists, setRoomExists] =
     useState(null);
 
+  // Check Room Exists
   useEffect(() => {
     const checkRoom = async () => {
       try {
@@ -37,6 +40,7 @@ function RoomPage() {
     checkRoom();
   }, [roomId]);
 
+  // Socket Join Room
   useEffect(() => {
     const user = JSON.parse(
       localStorage.getItem("user")
@@ -53,6 +57,7 @@ function RoomPage() {
       "participants-update",
       (data) => {
         setParticipants(data.count);
+        setUsers(data.users || []);
       }
     );
 
@@ -63,6 +68,7 @@ function RoomPage() {
     };
   }, [roomId, roomExists]);
 
+  // Loading State
   if (roomExists === null) {
     return (
       <div className="min-h-screen flex justify-center items-center">
@@ -73,6 +79,7 @@ function RoomPage() {
     );
   }
 
+  // Room Not Found
   if (roomExists === false) {
     return (
       <div className="min-h-screen flex flex-col justify-center items-center">
@@ -100,6 +107,7 @@ function RoomPage() {
 
       <Container>
         <div className="py-6">
+          {/* Room Info */}
           <div className="mb-6">
             <div className="flex items-center gap-3 flex-wrap">
               <h2 className="text-xl font-bold">
@@ -138,11 +146,12 @@ function RoomPage() {
             </div>
 
             <p className="text-zinc-400 mt-2">
-              👥 Participants Online: {participants}
-              
+              👥 Participants Online:{" "}
+              {participants}
             </p>
           </div>
 
+          {/* Editor + Chat */}
           <div className="grid lg:grid-cols-5 gap-6">
             <div className="lg:col-span-4">
               <CodeEditor />
@@ -153,8 +162,11 @@ function RoomPage() {
             </div>
           </div>
 
+          {/* Participants + Whiteboard */}
           <div className="grid md:grid-cols-2 gap-6 mt-6">
-            <ParticipantsPanel />
+            <ParticipantsPanel
+              participants={users}
+            />
 
             <Whiteboard />
           </div>
