@@ -7,6 +7,7 @@ import socket from "../../services/socket";
 import {
   getRoom,
   saveRoomCode,
+  executeCode,
 } from "../../services/roomService";
 
 function CodeEditor() {
@@ -21,7 +22,13 @@ function CodeEditor() {
 }`
   );
 
-  // Load saved code from MongoDB
+  const [output, setOutput] =
+    useState("");
+
+  const [running, setRunning] =
+    useState(false);
+
+  // Load saved code
   useEffect(() => {
     const fetchRoomCode = async () => {
       try {
@@ -43,7 +50,7 @@ function CodeEditor() {
     fetchRoomCode();
   }, [roomId]);
 
-  // Receive code updates from other users
+  // Receive code updates
   useEffect(() => {
     socket.on(
       "receive-code-change",
@@ -67,13 +74,11 @@ function CodeEditor() {
 
     setCode(updatedCode);
 
-    // Real-time sync
     socket.emit("code-change", {
       roomCode: roomId,
       code: updatedCode,
     });
 
-    // Save to MongoDB
     try {
       await saveRoomCode(
         roomId,
@@ -84,47 +89,99 @@ function CodeEditor() {
     }
   };
 
+  const handleRunCode =
+    async () => {
+      try {
+        if (
+          language !== "javascript"
+        ) {
+          setOutput(
+            `${language} execution coming soon 🚀`
+          );
+          return;
+        }
+
+        setRunning(true);
+
+        const response =
+          await executeCode(code);
+
+        setOutput(
+          response.output
+        );
+      } catch (error) {
+        setOutput(
+          "Execution Failed"
+        );
+      } finally {
+        setRunning(false);
+      }
+    };
+
   return (
-    <div className="h-[500px] bg-zinc-900 rounded-xl overflow-hidden">
+    <div className="bg-zinc-900 rounded-xl overflow-hidden">
       <div className="flex justify-between items-center p-3 border-b border-zinc-800">
         <h2 className="font-semibold">
           Code Editor
         </h2>
 
-        <select
-          value={language}
-          onChange={(e) =>
-            setLanguage(
-              e.target.value
-            )
-          }
-          className="bg-zinc-800 border border-zinc-700 rounded px-3 py-1"
-        >
-          <option value="javascript">
-            JavaScript
-          </option>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleRunCode}
+            disabled={running}
+            className="bg-green-600 hover:bg-green-700 px-3 py-1 rounded"
+          >
+            {running
+              ? "Running..."
+              : "▶ Run"}
+          </button>
 
-          <option value="python">
-            Python
-          </option>
+          <select
+            value={language}
+            onChange={(e) =>
+              setLanguage(
+                e.target.value
+              )
+            }
+            className="bg-zinc-800 border border-zinc-700 rounded px-3 py-1"
+          >
+            <option value="javascript">
+              JavaScript
+            </option>
 
-          <option value="java">
-            Java
-          </option>
+            <option value="python">
+              Python
+            </option>
 
-          <option value="cpp">
-            C++
-          </option>
-        </select>
+            <option value="java">
+              Java
+            </option>
+
+            <option value="cpp">
+              C++
+            </option>
+          </select>
+        </div>
       </div>
 
       <Editor
-        height="450px"
+        height="500px"
         language={language}
         theme="vs-dark"
         value={code}
         onChange={handleCodeChange}
       />
+
+      <div className="border-t border-zinc-800 p-4">
+        <h3 className="font-semibold mb-2">
+          Output
+        </h3>
+
+        <pre className="bg-black rounded p-3 text-green-400 overflow-x-auto min-h-[100px] whitespace-pre-wrap">
+          {output ||
+            "Run code to see output..."}
+        </pre>
+      </div>
     </div>
   );
 }

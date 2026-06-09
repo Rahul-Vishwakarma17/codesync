@@ -4,5 +4,3 @@ ohk so wihile we connect to mongo atlas same error of dns attack so we have alre
 so we dont have to do it again 
 just put the mongo string without srv vala 
 
-
-6HPSUH

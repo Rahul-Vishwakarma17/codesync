@@ -80,3 +80,22 @@ export const getRecentRooms = async () => {
 
   return response.data;
 };
+
+export const executeCode = async (
+  code
+) => {
+  const token =
+    localStorage.getItem("token");
+
+  const response = await api.post(
+    "/code/execute",
+    { code },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
+};
