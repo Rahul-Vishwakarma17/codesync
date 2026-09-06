@@ -2,9 +2,69 @@
 const activeRooms = {};
 const roomUsers = {};
 
+const broadcastParticipants = (io, roomCode) => {
+  if (!activeRooms[roomCode]) return;
+
+  const users = roomUsers[roomCode] || [];
+
+  // Show each user only once
+  const uniqueUsers = [];
+
+  users.forEach((user) => {
+    const alreadyExists = uniqueUsers.some(
+      (existingUser) =>
+        existingUser.userId === user.userId
+    );
+
+    if (!alreadyExists) {
+      uniqueUsers.push(user);
+    }
+  });
+
+  io.to(roomCode).emit(
+    "participants-update",
+    {
+      count: uniqueUsers.length,
+      users: uniqueUsers,
+    }
+  );
+};
+
+const removeSocketFromRoom = (
+  io,
+  socket,
+  roomCode
+) => {
+
+  if (!activeRooms[roomCode]) return;
+
+  activeRooms[roomCode].delete(
+    socket.id
+  );
+
+  if (roomUsers[roomCode]) {
+    roomUsers[roomCode] =
+      roomUsers[roomCode].filter(
+        (user) =>
+          user.socketId !== socket.id
+      );
+  }
+
+  broadcastParticipants(
+    io,
+    roomCode
+  );
+
+  if (
+    activeRooms[roomCode].size === 0
+  ) {
+    delete activeRooms[roomCode];
+    delete roomUsers[roomCode];
+  }
+};
+
 const socketHandler = (io) => {
   io.on("connection", (socket) => {
-    console.log(`User Connected: ${socket.id}`);
 
     // Join Room
     socket.on("join-room", (data) => {
@@ -20,29 +80,42 @@ const socketHandler = (io) => {
         roomUsers[roomCode] = [];
       }
 
-      activeRooms[roomCode].add(socket.id);
-
-      roomUsers[roomCode] =
-  roomUsers[roomCode].filter(
-    (existingUser) =>
-      existingUser.name !== user.name
-  );
-
-roomUsers[roomCode].push({
-  socketId: socket.id,
-  name: user.name,
-});
-
-      io.to(roomCode).emit(
-        "participants-update",
-        {
-          count: activeRooms[roomCode].size,
-          users: roomUsers[roomCode],
-        }
+      activeRooms[roomCode].add(
+        socket.id
       );
 
-      console.log(
-        `${user.name} joined room ${roomCode}`
+      // Remove an older socket entry
+      // for the same user in this room
+      roomUsers[roomCode] =
+        roomUsers[roomCode].filter(
+          (existingUser) =>
+            existingUser.userId !==
+            user.id
+        );
+
+      roomUsers[roomCode].push({
+        socketId: socket.id,
+        userId: user.id,
+        name: user.name,
+      });
+
+      broadcastParticipants(
+        io,
+        roomCode
+      );
+    });
+
+    // Leave Room
+    socket.on("leave-room", (roomCode) => {
+
+      if (!roomCode) return;
+
+      socket.leave(roomCode);
+
+      removeSocketFromRoom(
+        io,
+        socket,
+        roomCode
       );
     });
 
@@ -68,45 +141,18 @@ roomUsers[roomCode].push({
     socket.on("disconnect", () => {
       Object.keys(activeRooms).forEach(
         (roomCode) => {
-          if (activeRooms[roomCode]) {
-            activeRooms[roomCode].delete(
+          if (
+            activeRooms[roomCode]?.has(
               socket.id
+            )
+          ) {
+            removeSocketFromRoom(
+              io,
+              socket,
+              roomCode
             );
-
-            if (roomUsers[roomCode]) {
-              roomUsers[roomCode] =
-                roomUsers[roomCode].filter(
-                  (user) =>
-                    user.socketId !==
-                    socket.id
-                );
-            }
-
-            io.to(roomCode).emit(
-              "participants-update",
-              {
-                count:
-                  activeRooms[roomCode]
-                    .size,
-                users:
-                  roomUsers[roomCode] ||
-                  [],
-              }
-            );
-
-            if (
-              activeRooms[roomCode].size ===
-              0
-            ) {
-              delete activeRooms[roomCode];
-              delete roomUsers[roomCode];
-            }
           }
         }
-      );
-
-      console.log(
-        `User Disconnected: ${socket.id}`
       );
     });
   });

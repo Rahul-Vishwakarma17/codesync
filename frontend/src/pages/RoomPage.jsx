@@ -46,24 +46,36 @@ function RoomPage() {
       localStorage.getItem("user")
     );
 
-    if (!roomExists) return;
+    if (!roomExists || !user) return;
 
+    console.log(
+      "JOINING USER:",
+      user
+    );
+
+    const handleParticipantsUpdate = (
+      data
+    ) => {
+      setParticipants(data.count);
+      setUsers(data.users || []);
+    };
+
+    // Listen first
+    socket.on(
+      "participants-update",
+      handleParticipantsUpdate
+    );
+
+    // Then join room
     socket.emit("join-room", {
       roomCode: roomId,
       user,
     });
 
-    socket.on(
-      "participants-update",
-      (data) => {
-        setParticipants(data.count);
-        setUsers(data.users || []);
-      }
-    );
-
     return () => {
       socket.off(
-        "participants-update"
+        "participants-update",
+        handleParticipantsUpdate
       );
     };
   }, [roomId, roomExists]);
@@ -107,6 +119,7 @@ function RoomPage() {
 
       <Container>
         <div className="py-6">
+
           {/* Room Info */}
           <div className="mb-6">
             <div className="flex items-center gap-3 flex-wrap">
@@ -170,6 +183,7 @@ function RoomPage() {
 
             <Whiteboard />
           </div>
+
         </div>
       </Container>
     </div>
